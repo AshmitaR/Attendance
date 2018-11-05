@@ -114,6 +114,7 @@ def show_attendance():
             cursor.execute(sql, val)
             mydb.commit()
         return render_template('table.html', dataset=dataset)
+ return render_template('index_table.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
