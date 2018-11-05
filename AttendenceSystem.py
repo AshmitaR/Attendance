@@ -1,8 +1,36 @@
 from flask import Flask,render_template,request
 import MySQLdb,csv
+import tablib
+import os
+
 
 
 app = Flask(__name__)
+
+ROOT = os.path.dirname(os.path.abspath(__file__))
+dataset = tablib.Dataset()
+
+mydb = MySQLdb.connect(host="localhost", user="", passwd="")
+
+cursor_em = mydb.cursor()
+DATABASE_NAME = "employeeattendance"
+cursor_em.execute("SHOW DATABASES")
+
+check = False
+for x in cursor_em:
+    print(x)
+    if x == (DATABASE_NAME,):
+        check = True
+        mydb = MySQLdb.connect(host="localhost", user="", db=DATABASE_NAME)
+        cursor=mydb.cursor()
+        break
+if not check:
+    cursor_em.execute("CREATE DATABASE " + DATABASE_NAME)
+    mydb = MySQLdb.connect(host="localhost", user="", db=DATABASE_NAME)
+    cursor_em=mydb.cursor()
+    cursor_em.execute("CREATE TABLE tbl_attendance (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), attendance VARCHAR(255))")
+
+
 
 conn= MySQLdb.connect(host="localhost", user="root", db="attendence_system")
 cursor = conn.cursor()
@@ -67,7 +95,25 @@ def export():
 
 @app.route('/employee/show_attendence', methods=["GET", "POST"])
 def show_attendance():
-    return render_template("csv_generator.html")
+    if request.method == 'POST':
+        target = os.path.join(ROOT, 'temp/')
+
+        if not os.path.isdir(target):
+            os.mkdir(target)
+        file = request.files['file']
+        filename = file.filename
+        destination = target + 'temp.csv'
+        file.save(destination)
+        with open(destination, 'r') as f:
+            dataset.csv = f.read()
+            r = csv.DictReader(f)
+            print(dataset.csv)
+        for x in dataset:
+            val = (x[1], x[2])
+            sql = "INSERT INTO tbl_attendance(name,attendance) VALUES (%s, %s)"
+            cursor.execute(sql, val)
+            mydb.commit()
+        return render_template('table.html', dataset=dataset)
 
 if __name__ == '__main__':
     app.run(debug=True)
