@@ -71,7 +71,7 @@ def enter_employee():
 @app.route('/employee/create', methods=["GET", "POST"])
 def create():
     employee_name = str(request.args.get('employee_name', ""))
-    cursor = conn.cursor()
+    cursor = mydb.cursor()
     cursor.execute('INSERT INTO employee (employee_name)VALUES(%s)', [employee_name])
     mydb.commit()
     cursor.close()
