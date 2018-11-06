@@ -72,7 +72,7 @@ def enter_employee():
 def create():
     employee_name = str(request.args.get('employee_name', ""))
     cursor = mydb.cursor()
-    cursor.execute('INSERT INTO employee (employee_name)VALUES(%s)', [employee_name])
+    cursor.execute('INSERT INTO employee (name)VALUES(%s)', [employee_name])
     mydb.commit()
     cursor.close()
     return render_template("enter_employee.html")
