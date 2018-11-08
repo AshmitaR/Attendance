@@ -10,7 +10,7 @@ app = Flask(__name__)
 ROOT = os.path.dirname(os.path.abspath(__file__))
 dataset = tablib.Dataset()
 
-mydb = MySQLdb.connect(host="localhost", user="", passwd="")
+mydb = MySQLdb.connect(host="localhost", user="hacker", passwd="xyz_zyx")
 
 cursor = mydb.cursor()
 DATABASE_NAME = "employeeattendance"
@@ -21,12 +21,12 @@ for x in cursor:
     print(x)
     if x == (DATABASE_NAME,):
         check = True
-        mydb = MySQLdb.connect(host="localhost", user="", db=DATABASE_NAME)
+        mydb = MySQLdb.connect(host="localhost", user="hacker", passwd="xyz_zyx", db=DATABASE_NAME)
         cursor=mydb.cursor()
         break
 if not check:
     cursor.execute("CREATE DATABASE " + DATABASE_NAME)
-    mydb = MySQLdb.connect(host="localhost", user="", db=DATABASE_NAME)
+    mydb = MySQLdb.connect(host="localhost", user="hacker", passwd="xyz_zyx", db=DATABASE_NAME)
     cursor=mydb.cursor()
     cursor.execute("CREATE TABLE tbl_attendance (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), attendance VARCHAR(255))")
     cursor.execute("CREATE TABLE admin (username VARCHAR(255) PRIMARY KEY, password VARCHAR(255)")
@@ -82,7 +82,6 @@ def export():
     cursor = mydb.cursor()
     cursor.execute('SELECT * FROM employee')
     res = cursor.fetchall()
-    print res
     with open('output.csv', 'w') as fileout:
         writer = csv.writer(fileout)
         writer.writerows(res)
@@ -115,4 +114,4 @@ def show_attendence():
     return render_template('upload.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',port=5000,debug=True)
+    app.run(debug=True)
